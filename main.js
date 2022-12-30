@@ -1,21 +1,17 @@
-// import { Repository } from "./rep"
-
 const changeInput = document.querySelector('.searchInput')
 
 
+//create/remove elements
 class HtmlElements {
     constructor() {
         this.app = document.querySelector('.app')
         this.searchWrapper = document.querySelector('.searching-wrapper')
 
+        this.searchRepWrapper = this.createElement('div', 'searchRepWrapper')
         this.repWrapper = this.createElement('div', 'selected-rep-wrapper')
-        // this.repList = this.createElement('ul', 'rep-list')
-        // this.repWrapper.append(this.repList)
-
+        this.app.append(this.searchRepWrapper)
         this.app.append(this.repWrapper)
-
     }
-
 
     //create element
     createElement(elTag, elClass) {
@@ -26,13 +22,52 @@ class HtmlElements {
         return element
     }
 
-    //add search content
+    //create and add search content
     createSearchRep(data) {
         const searchPreviewRep = this.createElement('div', 'searchPreviewRep')
         searchPreviewRep.innerHTML = `<p>${data.name}</p>`
-        Search.addClickEvent(data, searchPreviewRep)
-        this.searchWrapper.append(searchPreviewRep)
+        this.addClickEvent(data, searchPreviewRep)
+        this.searchRepWrapper.append(searchPreviewRep)
     }
+
+    //create and add selected rep content
+    createSelectedRep(data) {
+        const selectedRepWrapper = document.querySelector('.selected-rep-wrapper')
+        const selectedRep = this.createElement('div', 'selectedRep')
+        selectedRep.innerHTML = `<div>    <p>Name: ${data.name}</p>
+                                        <p>Owner: ${data.owner}</p>
+                                        <p>Stars: ${data.stars}</p>
+                                </div>`
+
+        //maintaining the quantity
+        const allSelectedRep = document.querySelectorAll('.selectedRep')
+        if (allSelectedRep.length > 2) {
+            allSelectedRep[1].remove()
+        }
+        selectedRepWrapper.append(selectedRep)
+        this.createCross()
+    }
+
+    //create crosses
+    createCross() {
+        const crossWr = this.createElement('div', 'crossSvg')
+        const leftDown = this.createElement('div', 'leftDown')
+        const leftUp = this.createElement('div', 'leftUp')
+        leftDown.innerHTML = `<svg width="46" height="42" viewBox="0 0 46 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 40.5L44 2" stroke="#FF0000" stroke-width="4"/>
+        </svg>
+        `
+        leftUp.innerHTML = `<svg width="46" height="42" viewBox="0 0 46 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M44 40.5L2 2" stroke="#FF0000" stroke-width="4"/>
+        </svg>
+        `
+        crossWr.append(leftDown)
+        crossWr.append(leftUp)
+        const selectedRepForCross = document.querySelector('.selectedRep')
+        selectedRepForCross.append(crossWr)
+
+    }
+
     //remove repositories when search reloaded
     removeRepWithReload() {
         const previewReps = document.querySelectorAll('.searchPreviewRep')
@@ -45,51 +80,23 @@ class HtmlElements {
         removeRep()
     }
 
-    //add selected rep content to main
-    static createSelectedRep(data) {
-        console.log('cringe')
-        const selectedRep = this.createElement('div', 'selectedRep')
-        selectedRep.innerHTML = `<p>    Name: ${data.name}<br>
-                                        Owner: ${data.owner}<br>
-                                        Stars: ${data.stars}<br>
-                                </p>`
-        // selectedRep.addEventListener('click',)
-        this.app.append(selectedRep)
-    }
-
-}
-
-
-class Search {
-    static addClickEvent(data, element) {
+    //click event
+    addClickEvent(data, element) {
         const addRep = () => {
-            console.log(data.name)
             const nodeListPreViewRep = document.querySelectorAll('.searchPreviewRep')
             nodeListPreViewRep.forEach((rep) => {
                 rep.remove()
             })
             changeInput.value = ''
-        }
-
-        const addSelectedRep = () => {
-            // console.log(this)
-            // this.HtmlElements.createSelectedRep(data)
-            this.HtmlElements.createSelectedRep.apply(this.HtmlElements, data)
-
+            this.createSelectedRep(data)
         }
         element.addEventListener('click', addRep)
-        element.addEventListener('click', addSelectedRep)
     }
-    // static addSelectedEvent(data, element) {
-    //     const addSelectedRep = () => {
-    //         console.log('da-detka')
-
-    //     }
-
-    //     element.addEventListener('click', addSelectedRep)
-    // }
+}
 
 
+//logic of work
+class Search {
     constructor(htmlElements) {
         this.HtmlElements = htmlElements
         this.repData
@@ -111,7 +118,7 @@ class Search {
         if (changeInput.value !== '') {
             let responce = await fetch(url)
             responce = await responce.json()
-            // let repData
+
             responce.items.forEach((rep) => {
                 this.repData = {
                     name: rep.name,
@@ -119,9 +126,6 @@ class Search {
                     stars: rep.stargazers_count
                 }
                 this.HtmlElements.createSearchRep(this.repData)
-                // this.HtmlElements.createSelectedRep(this.repData)
-                console.log(this.repData)
-
             })
         }
     }
@@ -139,5 +143,5 @@ class Search {
 
 }
 
-
+//init
 new Search(new HtmlElements())
