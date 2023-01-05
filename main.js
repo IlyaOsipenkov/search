@@ -26,7 +26,7 @@ class HtmlElements {
     createSearchRep(data) {
         const searchPreviewRep = this.createElement('div', 'searchPreviewRep')
         searchPreviewRep.innerHTML = `<p>${data.name}</p>`
-        this.addClickEvent(data, searchPreviewRep)
+        this.addClickEventCreate(data, searchPreviewRep)
         this.searchRepWrapper.append(searchPreviewRep)
     }
 
@@ -45,11 +45,12 @@ class HtmlElements {
             allSelectedRep[1].remove()
         }
         selectedRepWrapper.append(selectedRep)
-        this.createCross()
+        this.createCross(selectedRep)
+        this.addClickEventDelete(selectedRep)
     }
 
     //create crosses
-    createCross() {
+    createCross(selectedRep) {
         const crossWr = this.createElement('div', 'crossSvg')
         const leftDown = this.createElement('div', 'leftDown')
         const leftUp = this.createElement('div', 'leftUp')
@@ -63,8 +64,7 @@ class HtmlElements {
         `
         crossWr.append(leftDown)
         crossWr.append(leftUp)
-        const selectedRepForCross = document.querySelector('.selectedRep')
-        selectedRepForCross.append(crossWr)
+        selectedRep.append(crossWr)
 
     }
 
@@ -80,8 +80,8 @@ class HtmlElements {
         removeRep()
     }
 
-    //click event
-    addClickEvent(data, element) {
+    //click event for create
+    addClickEventCreate(data, element) {
         const addRep = () => {
             const nodeListPreViewRep = document.querySelectorAll('.searchPreviewRep')
             nodeListPreViewRep.forEach((rep) => {
@@ -91,6 +91,15 @@ class HtmlElements {
             this.createSelectedRep(data)
         }
         element.addEventListener('click', addRep)
+    }
+
+    //click event for delete
+    addClickEventDelete(element) {
+        const removeRep = () => {
+            element.remove()
+        }
+
+        element.addEventListener('click', removeRep)
     }
 }
 
